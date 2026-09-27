@@ -57,7 +57,10 @@ def exclude_local(repo):
         return
     path = os.path.join(common if os.path.isabs(common) else os.path.join(repo, common), 'info', 'exclude')
     line = '.claude/settings.local.json'
-    cur = open(path, encoding='utf-8').read().splitlines() if os.path.exists(path) else []
+    cur = []
+    if os.path.exists(path):
+        with open(path, encoding='utf-8') as f:
+            cur = f.read().splitlines()
     if line not in cur:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'a', encoding='utf-8') as f:

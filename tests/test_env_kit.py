@@ -29,6 +29,11 @@ def write(path, text):
         f.write(text)
 
 
+def read_json(path):
+    with open(path, encoding='utf-8') as f:
+        return json.load(f)
+
+
 class AuditTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -128,12 +133,12 @@ class ConnectorScopeTest(unittest.TestCase):
     def test_表示だけでは書き込まない(self):
         out = self.run_scope()
         self.assertIn('切る対象は1件', out)
-        local = json.load(open(os.path.join(self.root, 'app', '.claude', 'settings.local.json'), encoding='utf-8'))
+        local = read_json(os.path.join(self.root, 'app', '.claude', 'settings.local.json'))
         self.assertNotIn('disableClaudeAiConnectors', local)
 
     def test_コードのリポジトリだけ切り既存の判断と設定を残す(self):
         self.run_scope('--apply')
-        local = json.load(open(os.path.join(self.root, 'app', '.claude', 'settings.local.json'), encoding='utf-8'))
+        local = read_json(os.path.join(self.root, 'app', '.claude', 'settings.local.json'))
         self.assertIs(local['disableClaudeAiConnectors'], True)
         self.assertEqual(local['permissions'], {'allow': ['Bash(ls)']})
         self.assertFalse(os.path.exists(os.path.join(self.root, 'api', '.claude', 'settings.local.json')))
