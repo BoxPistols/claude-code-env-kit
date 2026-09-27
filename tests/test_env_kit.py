@@ -12,6 +12,7 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AUDIT = os.path.join(ROOT, 'plugins', 'env-kit', 'skills', 'env-audit', 'claude-env-audit.py')
 SIGN = os.path.join(ROOT, 'templates', 'hooks', 'no-ai-signature.py')
+SCOPE = os.path.join(ROOT, 'tools', 'connector-scope.py')
 
 
 def audit(home, project):
@@ -102,6 +103,43 @@ class SignatureHookTest(unittest.TestCase):
         ):
             with self.subTest(cmd=cmd):
                 self.assertEqual(self.run_hook(cmd), 0)
+
+
+class ConnectorScopeTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = self.tmp.name
+        for name, marker in (('app', 'package.json'), ('api', 'pyproject.toml'), ('notes', 'README.md')):
+            d = os.path.join(self.root, name)
+            os.makedirs(d)
+            subprocess.run(['git', 'init', '-q', d], check=True)
+            write(os.path.join(d, marker), '{}')
+        # コネクタを使うと決めているリポジトリ
+        write(os.path.join(self.root, 'api', '.claude', 'settings.json'), json.dumps({'disableClaudeAiConnectors': False}))
+        # 既存の設定は残す
+        write(os.path.join(self.root, 'app', '.claude', 'settings.local.json'), json.dumps({'permissions': {'allow': ['Bash(ls)']}}))
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def run_scope(self, *extra):
+        return subprocess.run([sys.executable, SCOPE, self.root, *extra], capture_output=True, text=True, encoding='utf-8', check=True).stdout
+
+    def test_表示だけでは書き込まない(self):
+        out = self.run_scope()
+        self.assertIn('切る対象は1件', out)
+        local = json.load(open(os.path.join(self.root, 'app', '.claude', 'settings.local.json'), encoding='utf-8'))
+        self.assertNotIn('disableClaudeAiConnectors', local)
+
+    def test_コードのリポジトリだけ切り既存の判断と設定を残す(self):
+        self.run_scope('--apply')
+        local = json.load(open(os.path.join(self.root, 'app', '.claude', 'settings.local.json'), encoding='utf-8'))
+        self.assertIs(local['disableClaudeAiConnectors'], True)
+        self.assertEqual(local['permissions'], {'allow': ['Bash(ls)']})
+        self.assertFalse(os.path.exists(os.path.join(self.root, 'api', '.claude', 'settings.local.json')))
+        self.assertFalse(os.path.exists(os.path.join(self.root, 'notes', '.claude')))
+        with open(os.path.join(self.root, 'app', '.git', 'info', 'exclude'), encoding='utf-8') as f:
+            self.assertIn('.claude/settings.local.json', f.read())
 
 
 if __name__ == '__main__':
