@@ -11,11 +11,11 @@
 ## 入れ方
 
 ```
-claude plugin marketplace add <このリポジトリ>
+claude plugin marketplace add BoxPistols/claude-code-env-kit
 claude plugin install env-kit@claude-code-env-kit
 ```
 
-`<このリポジトリ>`には、GitHubの`owner/repo`か、cloneしたディレクトリのパスを入れます。
+組織のアカウントへ移したりforkしたりした場合は、`BoxPistols/claude-code-env-kit`をそのリポジトリの`owner/repo`に読み替えます。cloneしたディレクトリのパスも指定できます。更新は`claude plugin update env-kit@claude-code-env-kit`です。
 
 チームのリポジトリで常に使えるようにするには、`templates/settings.project.example.json`を参考に、そのリポジトリの`.claude/settings.json`へ`enabledPlugins`を足してcommitします。
 
