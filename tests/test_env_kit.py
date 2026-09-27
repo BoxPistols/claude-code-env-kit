@@ -71,6 +71,13 @@ class AuditTest(unittest.TestCase):
         self.assertIn('書き方', [r['kind'] for r in self.items('要確認')])
 
 
+    def test_コネクタを切っていなければ情報として示す(self):
+        write(os.path.join(self.home, '.claude', 'settings.json'), json.dumps({}))
+        self.assertIn('claude.aiのコネクタ', [r['item'] for r in self.items('情報')])
+        write(os.path.join(self.project, '.claude', 'settings.local.json'), json.dumps({'disableClaudeAiConnectors': True}))
+        self.assertIn('claude.aiのコネクタ', [r['item'] for r in self.items('OK')])
+
+
 class SignatureHookTest(unittest.TestCase):
     def run_hook(self, command):
         data = json.dumps({'tool_input': {'command': command}, 'cwd': ROOT})
