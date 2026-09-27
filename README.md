@@ -17,7 +17,7 @@ claude plugin install env-kit@claude-code-env-kit
 
 組織のアカウントへ移したりforkしたりした場合は、`BoxPistols/claude-code-env-kit`をそのリポジトリの`owner/repo`に読み替えます。cloneしたディレクトリのパスも指定できます。更新は`claude plugin update env-kit@claude-code-env-kit`です。
 
-チームのリポジトリで常に使えるようにするには、`templates/settings.project.example.json`を参考に、そのリポジトリの`.claude/settings.json`へ`enabledPlugins`を足してcommitします。
+チームのリポジトリで全員が使えるようにするには、`templates/settings.project.example.json`の`extraKnownMarketplaces`と`enabledPlugins`を、そのリポジトリの`.claude/settings.json`へ足してcommitします。リポジトリを開いた人には、マーケットプレイスの追加とプラグインの導入が案内されます。
 
 ## 使い方
 
