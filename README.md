@@ -44,6 +44,8 @@ claude plugin install env-kit@claude-code-env-kit
 
 手順は[CONTRIBUTING.md](CONTRIBUTING.md)にあります。
 
+すぐに着手できる改善の候補は、ラベル「改善の候補」のissueにまとめています。新しい候補を見つけたら、完了の条件を添えてissueを立ててください。
+
 ## ライセンス
 
 MIT
