@@ -74,7 +74,8 @@ def iter_hooks(settings):
             for h in g.get('hooks') or []:
                 yield event, g.get('matcher', ''), h
 
-SCRIPT_RX = re.compile(r'([~/][^\s"\']+\.(?:sh|py|js|mjs|cjs))')
+# ~/ と / で始まるパスに加え、WindowsのC:\のようなドライブ文字で始まるパスも拾う
+SCRIPT_RX = re.compile(r'((?:[~/]|[A-Za-z]:[\\/])[^\s"\']+\.(?:sh|py|js|mjs|cjs))')
 def script_body(cmd):
     # hookが呼ぶスクリプトの中身。ネットワーク処理がコマンド文字列ではなくスクリプトの中にある場合に拾う
     out = []

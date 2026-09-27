@@ -7,7 +7,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -15,9 +15,13 @@ jobs:
         with:
           python-version: '3.x'
       - name: JSONの構文
+        shell: bash
         run: |
           for f in .claude-plugin/marketplace.json plugins/*/.claude-plugin/plugin.json templates/*.json; do
-            python3 -m json.tool "$f" > /dev/null || { echo "壊れている: $f"; exit 1; }
+            python -m json.tool "$f" > /dev/null || { echo "壊れている: $f"; exit 1; }
           done
       - name: テスト
-        run: python3 -m unittest discover -s tests -v
+        shell: bash
+        env:
+          PYTHONUTF8: '1'
+        run: python -m unittest discover -s tests -v

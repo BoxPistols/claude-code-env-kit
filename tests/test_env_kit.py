@@ -15,9 +15,10 @@ SIGN = os.path.join(ROOT, 'templates', 'hooks', 'no-ai-signature.py')
 
 
 def audit(home, project):
-    env = {**os.environ, 'HOME': home}
+    # WindowsのPythonはホームの判定にUSERPROFILEを使うので、両方を仮の場所に向ける
+    env = {**os.environ, 'HOME': home, 'USERPROFILE': home}
     out = subprocess.run([sys.executable, AUDIT, project, '--json'], env=env,
-                         capture_output=True, text=True, check=True).stdout
+                         capture_output=True, text=True, encoding='utf-8', check=True).stdout
     return json.loads(out)
 
 
@@ -81,7 +82,7 @@ class AuditTest(unittest.TestCase):
 class SignatureHookTest(unittest.TestCase):
     def run_hook(self, command):
         data = json.dumps({'tool_input': {'command': command}, 'cwd': ROOT})
-        return subprocess.run([sys.executable, SIGN], input=data, capture_output=True, text=True).returncode
+        return subprocess.run([sys.executable, SIGN], input=data, capture_output=True, text=True, encoding='utf-8').returncode
 
     def test_止めるもの(self):
         for cmd in (
