@@ -1,0 +1,23 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: JSONの構文
+        run: |
+          for f in .claude-plugin/marketplace.json plugins/*/.claude-plugin/plugin.json templates/*.json; do
+            python3 -m json.tool "$f" > /dev/null || { echo "壊れている: $f"; exit 1; }
+          done
+      - name: テスト
+        run: python3 -m unittest discover -s tests -v

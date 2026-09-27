@@ -1,0 +1,10 @@
+{
+  "enabledPlugins": {
+    "env-kit@claude-code-env-kit": true
+  },
+  "permissions": {
+    "deny": [
+      "Read(//**/.env)", "Read(//**/.env.local)", "Read(//**/.env.*.local)", "Read(//**/.env.production)"
+    ]
+  }
+}

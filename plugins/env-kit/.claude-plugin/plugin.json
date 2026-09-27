@@ -1,0 +1,8 @@
+{
+  "name": "env-kit",
+  "description": "Claude Code環境の監査。毎セッションの読み込み量、hookの重さ、参照切れ、使われていない設定、古い書き方、権限を表で報告する。設定は書き換えない",
+  "version": "0.1.0",
+  "author": {
+    "name": "claude-code-env-kit contributors"
+  }
+}
