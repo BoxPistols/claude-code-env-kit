@@ -29,6 +29,17 @@ claude plugin install env-kit@claude-code-env-kit
 
 「要確認」の行を見て、直すかどうかを決めます。直し方は`docs/guide.md`にあります。
 
+## コネクタの読み込みを切る
+
+claude.aiのコネクタのツール名一覧は、使わないセッションでも毎回読み込まれます。実測で入力トークンの約3割を占めた例があります。`tools/connector-scope.py`は、コードのリポジトリ（gitのルートにpackage.jsonやpyproject.tomlなどがある）の`.claude/settings.local.json`に`"disableClaudeAiConnectors": true`を書きます。
+
+```
+python3 tools/connector-scope.py ~/dev            # 対象を表示するだけ
+python3 tools/connector-scope.py ~/dev --apply    # 書き込む
+```
+
+コネクタを使うリポジトリは、`.claude/settings.json`か`.claude/settings.local.json`に`"disableClaudeAiConnectors": false`を書いておくと対象から外れます。Slackやドキュメントの作業は、リポジトリの外で起動すれば今までどおりコネクタを使えます。
+
 ## 個人の設定とチームの設定の分け方
 
 | 置き場所 | 共有の範囲 | 入れるもの | 変え方 |
