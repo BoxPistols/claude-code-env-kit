@@ -132,6 +132,16 @@ def audit_plugins(user, project_settings):
     for name, on in ((project_settings or {}).get('enabledPlugins') or {}).items():
         add('プラグイン', f'{name}（このプロジェクト）', '情報', '有効' if on else '無効')
 
+def audit_connectors(user, project_settings):
+    # claude.aiのコネクタのツール名一覧は、使わないセッションでも毎回読み込まれる。実測で入力の約3割を占めた例がある
+    off = (user or {}).get('disableClaudeAiConnectors') or (project_settings or {}).get('disableClaudeAiConnectors')
+    if off:
+        add('読み込み量', 'claude.aiのコネクタ', 'OK', 'このプロジェクトでは読み込まない（disableClaudeAiConnectors）')
+    else:
+        add('読み込み量', 'claude.aiのコネクタ', '情報', 'claude.aiに接続したコネクタのツール名一覧が毎セッション読み込まれる。'
+            'コネクタを使わないリポジトリでは、.claude/settings.local.jsonに"disableClaudeAiConnectors": trueを書くと読み込まれない。'
+            'ユーザー設定でtrueにするとプロジェクト側で戻せない')
+
 # ── 5. 古い書き方 ──
 def audit_phrases(project):
     targets = [os.path.join(CLAUDE, 'CLAUDE.md'), os.path.join(project, 'CLAUDE.md')]
@@ -175,6 +185,7 @@ def main():
     audit_hooks(sources)
     audit_refs(sources, project)
     audit_plugins(user, merged_proj)
+    audit_connectors(user, {**proj, **local})
     audit_phrases(project)
     audit_permissions(user, merged_proj)
     order = {'要確認': 0, '情報': 1, 'OK': 2}
@@ -187,7 +198,7 @@ def main():
     for kind, item, status, detail in rows:
         print(f'| {status} | {kind} | {item} | {detail.replace("|", "/")} |')
     n = sum(1 for r in rows if r[2] == '要確認')
-    print(f'\n要確認 {n}件。自動では直さない。直すかどうかは表を見て決める。')
+    print(f'\n要確認は{n}件。自動では直さない。直すかどうかは表を見て決める。')
 
 if __name__ == '__main__':
     main()
